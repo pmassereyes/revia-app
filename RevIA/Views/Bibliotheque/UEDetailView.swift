@@ -1,0 +1,4 @@
+//
+//  UEDetailView.swift
+//  RevIA
+//

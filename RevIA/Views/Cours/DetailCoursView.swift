@@ -1,0 +1,4 @@
+//
+//  DetailCoursView.swift
+//  RevIA
+//

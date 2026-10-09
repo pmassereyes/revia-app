@@ -1,0 +1,4 @@
+//
+//  ReglagesView.swift
+//  RevIA
+//

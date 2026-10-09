@@ -1,0 +1,4 @@
+//
+//  ScanDocument.swift
+//  RevIA
+//

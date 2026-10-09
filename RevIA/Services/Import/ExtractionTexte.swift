@@ -1,0 +1,4 @@
+//
+//  ExtractionTexte.swift
+//  RevIA
+//

@@ -1,0 +1,4 @@
+//
+//  ResultatsView.swift
+//  RevIA
+//
