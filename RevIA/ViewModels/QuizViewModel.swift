@@ -10,7 +10,7 @@ import SwiftData
 /// Un quiz, question par question. Chaque réponse met aussitôt à jour la boîte de Leitner de la question,
 /// ce qui garde le suivi même si l'utilisateur quitte le quiz avant la fin.
 @Observable
-final class QuizViewModel {
+final class QuizViewModel: Identifiable {
     struct Reponse {
         let question: QuestionQCM
         let choix: Int
