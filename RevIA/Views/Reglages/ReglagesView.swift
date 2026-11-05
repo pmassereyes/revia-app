@@ -28,7 +28,7 @@ struct ReglagesView: View {
                 } header: {
                     Text("API de génération")
                 } footer: {
-                    Text("Sur le simulateur : http://127.0.0.1:8000. Sur un iPhone : http://nom-du-mac.local:8000. L'adresse et le jeton sont rangés dans le Keychain.")
+                    Text("API hébergée : https://nom-du-service.onrender.com. En développement : http://127.0.0.1:8000 sur le simulateur, http://nom-du-mac.local:8000 sur un iPhone. L'adresse et le jeton sont rangés dans le Keychain.")
                 }
 
                 Section {
@@ -65,7 +65,12 @@ struct ReglagesView: View {
         case .inconnu:
             EmptyView()
         case .enCours:
-            ProgressView()
+            HStack(spacing: 8) {
+                Text("Réveil possible, jusqu'à 1 min")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                ProgressView()
+            }
         case .joignable:
             Label("Serveur joignable", systemImage: "checkmark.circle.fill")
                 .foregroundStyle(.green)

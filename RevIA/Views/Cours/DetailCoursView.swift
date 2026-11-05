@@ -94,7 +94,7 @@ struct DetailCoursView: View {
                 ProgressView()
                 VStack(alignment: .leading) {
                     Text("Génération en cours…")
-                    Text("Comptez de 20 à 45 secondes.")
+                    Text("Comptez de 20 à 45 secondes, et jusqu'à une minute de plus si le serveur était en veille.")
                         .font(.footnote)
                         .foregroundStyle(.secondary)
                 }

@@ -41,6 +41,15 @@ struct RequeteQCMTests {
         #expect(requete.timeoutInterval == 300)
     }
 
+    @Test func leTestDeConnexionLaisseLeTempsAuServeurDeSeReveiller() {
+        let requete = APIGenerateur.requeteSante(a: configuration.urlDeBase)
+
+        #expect(requete.url?.absoluteString == "http://exemple.test:8000/health")
+        #expect(requete.timeoutInterval == 75)
+        // Réveil d'environ 1 min puis génération de 45 s au plus : le délai de génération les couvre
+        #expect(APIGenerateur.delaiMaximal >= 75 + 45)
+    }
+
     @Test func uneAdresseTermineeParUnSlashDonneLaMemeRoute() {
         let avecSlash = ConfigurationAPI(urlDeBase: URL(string: "http://exemple.test:8000/")!, jeton: "j")
         let requete = APIGenerateur(configuration: avecSlash).construireRequete(pdf: pdf, nbQuestions: 1)
