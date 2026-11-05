@@ -28,7 +28,7 @@ struct ARevoirView: View {
                     List {
                         Section {
                             VStack(alignment: .leading, spacing: 4) {
-                                Text("\(aRevoir.count) questions")
+                                Text(libelleQuestions(aRevoir.count))
                                     .font(.largeTitle.bold())
                                 Text("à revoir aujourd'hui")
                                     .foregroundStyle(.secondary)
@@ -61,6 +61,6 @@ struct ARevoirView: View {
         guard let prochaine = FileDeRevision.prochaineRevision(parmi: questions, apres: aujourdHui) else {
             return "Générez le QCM d'un cours : ses questions reviendront ici, selon vos réponses."
         }
-        return "Prochaine révision \(FileDeRevision.libelleJour(prochaine.jour, depuis: aujourdHui)) : \(prochaine.nombre) questions."
+        return "Prochaine révision \(FileDeRevision.libelleJour(prochaine.jour, depuis: aujourdHui))  : \(libelleQuestions(prochaine.nombre))."
     }
 }

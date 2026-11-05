@@ -13,7 +13,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## État actuel et écarts à connaître
 
-- **Le projet Xcode existe, mais l'app n'est pas implémentée.** En dehors de `RevIAApp.swift` et d'un `RootView` minimal, les fichiers `.swift` ne contiennent que leur en-tête : l'arborescence est un plan.
+- **Les phases 1 à 3 du README sont implémentées** (génération, MVP, mémorisation), avec leurs tests. Ne contiennent encore que leur en-tête : `ScanDocument.swift` (scan de notes papier, liste « Plus tard ») et `ExtractionTexte.swift`. Onglets de `RootView` : À revoir, Bibliothèque, Statistiques, Réglages.
 - **Outils** : Xcode 27, Swift 6.4, simulateurs iOS 27. Le README demande donc Xcode 27+.
 - **Mode de langage Swift 6, avec isolation par défaut sur `MainActor`** (`SWIFT_DEFAULT_ACTOR_ISOLATION`, réglage par défaut d'Xcode 27, sur la cible `RevIA` seulement) :
   - le code de l'app est `@MainActor` sans annotation, ViewModels `@Observable` compris ;
@@ -140,6 +140,7 @@ Un code inconnu se traite comme une erreur générique, avec le `message` reçu.
 - **« À revoir aujourd'hui »** : `FileDeRevision` filtre en mémoire les questions de `@Query` (les plus en retard d'abord). La date de référence (`aujourdHui`) est tenue par `RootView` et rafraîchie quand l'app revient au premier plan. Le quiz est **figé au lancement** (`fullScreenCover(item:)` avec un `QuizViewModel` créé au toucher) : répondre fait sortir les questions de la liste, et un quiz attaché à cette liste se fermerait avant les résultats.
 - **Quiz** : une seule réponse par question, corrigée tout de suite. Après la réponse, pas de `.disabled` sur les propositions, qui griserait la correction : on utilise `allowsHitTesting(false)`.
 - **`SessionRevision`** : date, périmètre (`cours` ou `aRevoir`), titre, score, et pour chaque réponse le thème, le nom de l'UE et le résultat (`ReponseSession`) : c'est la source des statistiques.
+- **Rappel quotidien** (`Notifications`) : désactivé par défaut, 18 h par défaut, réglé dans Réglages (`@AppStorage`, clés `CleRappel`). Les rappels sont planifiés sur 14 jours, un par jour où des questions sont à revoir, retards compris, avec leur nombre. Ils sont remplacés à chaque passage en arrière-plan ou au premier plan, et à chaque changement de réglage. Accord : `libelleQuestions(_:)` (« 0 question », « 1 question », « 3 questions »).
 - **Statistiques** (`StatsViewModel`, calculs purs à partir des `SessionRevision` et des boîtes des questions) par UE et par `theme`, avec Swift Charts. Les thèmes sont triés du plus faible au plus fort. **Rappel quotidien** par notification locale (`UNUserNotificationCenter`).
 - **Vérification visuelle sans piloter l'interface** : dans un test temporaire, jamais versionné, rendre une vue avec `ImageRenderer` en PNG, puis la regarder. Cela marche pour les vues en `VStack` ; `List` et `ScrollView` se rendent mal.
 

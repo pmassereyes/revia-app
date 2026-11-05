@@ -55,7 +55,7 @@ struct BibliothequeView: View {
                 Button("Supprimer", role: .destructive) { viewModel.supprimer(ue, contexte: contexte) }
                 Button("Annuler", role: .cancel) {}
             } message: { ue in
-                Text("« \(ue.nom) », ses \(ue.cours.count) cours et leurs questions seront supprimés.")
+                Text("« \(ue.nom) » sera supprimée, avec ses cours (\(ue.cours.count)), leurs PDF et leurs questions.")
             }
         }
     }

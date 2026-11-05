@@ -14,6 +14,8 @@ struct RootView: View {
     @State private var reglages = ReglagesViewModel(reglages: .standard)
     /// Rafraîchie au retour au premier plan, pour suivre le changement de jour.
     @State private var aujourdHui = Date.now
+    @AppStorage(CleRappel.actif) private var rappelActif = false
+    @AppStorage(CleRappel.minutes) private var rappelMinutes = Notifications.heureParDefaut
 
     var body: some View {
         TabView {
@@ -33,6 +35,11 @@ struct RootView: View {
         .task { StockageDonnees.reprendreGenerationsInterrompues(dans: contexte) }
         .onChange(of: phase) { _, nouvelle in
             if nouvelle == .active { aujourdHui = .now }
+            // Les réponses du jour changent le nombre de questions des rappels à venir
+            if nouvelle != .inactive {
+                let revisions = questions.filter { $0.cours != nil }.map(\.prochaineRevision)
+                Task { await Notifications.replanifier(revisions: revisions, actif: rappelActif, minutes: rappelMinutes) }
+            }
         }
     }
 }

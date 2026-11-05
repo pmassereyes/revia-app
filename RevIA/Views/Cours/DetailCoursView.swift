@@ -45,7 +45,7 @@ struct DetailCoursView: View {
                 }
                 if viewModel.peutGenerer {
                     Stepper(
-                        "\(viewModel.nbQuestions) questions",
+                        libelleQuestions(viewModel.nbQuestions),
                         value: $viewModel.nbQuestions,
                         in: DetailCoursViewModel.plageNbQuestions
                     )
@@ -79,7 +79,7 @@ struct DetailCoursView: View {
             Button("Régénérer", role: .destructive) { lancerGeneration() }
             Button("Annuler", role: .cancel) {}
         } message: {
-            Text("Les \(cours.questions.count) questions actuelles et leur suivi de révision seront remplacés.")
+            Text("Le QCM actuel (\(libelleQuestions(cours.questions.count))) et son suivi de révision seront remplacés.")
         }
     }
 
@@ -100,7 +100,7 @@ struct DetailCoursView: View {
                 }
             }
         case .terminee:
-            Label("\(cours.questions.count) questions", systemImage: "checkmark.circle.fill")
+            Label(libelleQuestions(cours.questions.count), systemImage: "checkmark.circle.fill")
                 .foregroundStyle(.green)
             if let avertissement = cours.avertissement {
                 Label(avertissement, systemImage: "exclamationmark.triangle")
