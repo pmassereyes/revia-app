@@ -5,14 +5,22 @@
 
 import SwiftUI
 
-/// Vue racine. Elle accueillera les onglets Bibliothèque, À revoir, Statistiques et Réglages.
+/// Vue racine : un onglet par grande fonction de l'app.
 struct RootView: View {
+    @State private var reglages = ReglagesViewModel(reglages: .standard)
+
     var body: some View {
-        ContentUnavailableView(
-            "RevIA",
-            systemImage: "book.closed",
-            description: Text("En construction")
-        )
+        TabView {
+            ContentUnavailableView(
+                "Bibliothèque",
+                systemImage: "books.vertical",
+                description: Text("En construction")
+            )
+            .tabItem { Label("Bibliothèque", systemImage: "books.vertical") }
+
+            ReglagesView(viewModel: reglages)
+                .tabItem { Label("Réglages", systemImage: "gearshape") }
+        }
     }
 }
 

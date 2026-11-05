@@ -30,7 +30,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Pas de schéma partagé** : Xcode et `xcodebuild` créent automatiquement le schéma `RevIA`. Le partager (`xcshareddata/xcschemes`) le jour où une CI en aura besoin.
 - **Identifiant d'équipe (`DEVELOPMENT_TEAM`) jamais versionné**, puisque le dépôt est public. Le simulateur n'en a pas besoin. Pour un iPhone réel, il passera par `Secrets.xcconfig` ; d'ici là, le choisir dans Xcode sans commiter la modification du projet.
 - Identifiant de bundle : choisi par l'utilisateur, jamais écrit ici.
-- **Reste à brancher** (avec l'écran Réglages) : `Config/Secrets.xcconfig` comme configuration de base (Debug et Release), les clés de l'`Info.plist` et l'exception ATS de Debug (voir « Configuration »).
+- **`Info.plist` de Debug** : `Config/Info-Debug.plist`, hors des dossiers synchronisés, branché par `"INFOPLIST_FILE[config=Debug]"` et fusionné par Xcode avec l'`Info.plist` généré (`GENERATE_INFOPLIST_FILE`). Rien en Release.
+- **Reste à brancher, par l'utilisateur dans Xcode (facultatif)** : `Config/Secrets.xcconfig` comme configuration de base (Projet → Info → Configurations). D'ici là, `$(API_BASE_URL)` et `$(API_TOKEN)` arrivent vides, et l'adresse et le jeton se saisissent dans Réglages.
 
 ## Commandes
 
@@ -108,12 +109,13 @@ Un code inconnu se traite comme une erreur générique, avec le `message` reçu.
 
 ## Configuration
 
-- **`Config/Secrets.xcconfig`** (ignoré par Git) fournit `API_BASE_URL` et `API_TOKEN` pour le Debug. Dans un `.xcconfig`, `//` démarre un commentaire : écrire `http:/$()/hote:8000`. Ces valeurs passent dans l'app par des clés de l'`Info.plist` (`$(API_BASE_URL)`) et se lisent avec `Bundle.main.object(forInfoDictionaryKey:)`.
-- **Keychain** (choix du README) : URL et jeton saisis dans Réglages, rangés dans le Keychain. **La valeur du Keychain prime**, et celle du `.xcconfig` ne sert que de valeur initiale en Debug.
+- **`Config/Secrets.xcconfig`** (ignoré par Git) fournit `API_BASE_URL` et `API_TOKEN` pour le Debug. Dans un `.xcconfig`, `//` démarre un commentaire : écrire `http:/$()/hote:8000`. Ces valeurs passent dans l'app par les clés de `Config/Info-Debug.plist` (`$(API_BASE_URL)`) et `ReglagesAPI` les lit dans `Bundle.main.infoDictionary`. Une variable absente arrive vide.
+- **Keychain** (choix du README) : URL et jeton saisis dans Réglages, rangés dans le Keychain (`Keychain`, service `RevIA`, clés `api.url` et `api.jeton`). **La valeur du Keychain prime**, et celle du `.xcconfig` ne sert que de valeur initiale en Debug. `ReglagesAPI.configuration` vaut `nil` tant que l'adresse n'est pas valide (http ou https, avec un hôte) ou que le jeton manque.
+- **Essai depuis le simulateur sans saisie** : passer les valeurs initiales en ligne de commande, par exemple `xcodebuild … API_BASE_URL=http://127.0.0.1:8765 API_TOKEN=<jeton jetable> build`.
 - **Adresse de l'API en dev** :
   - simulateur : `http://127.0.0.1:8000` (il partage le réseau du Mac) ;
   - iPhone réel : `http://<nom-du-mac>.local:8000` plutôt qu'une IP, car ce nom est stable d'un réseau à l'autre.
-- **ATS, en Debug uniquement** : `NSAppTransportSecurity` → `NSAllowsLocalNetworking = YES`, qui couvre les noms `.local`. La couverture d'une IP littérale n'a pas été vérifiée. En Release, pas d'exception : l'API devra être servie en HTTPS.
+- **ATS, en Debug uniquement** : `NSAppTransportSecurity` → `NSAllowsLocalNetworking = YES`, qui couvre les noms `.local`. **Vérifié le 2026-11-05 sur le simulateur** : `http://127.0.0.1` passe (GET et POST multipart), et passe même sans l'exception, car l'adresse de boucle locale n'est pas soumise à l'ATS. L'exception reste nécessaire pour `<nom-du-mac>.local` sur un iPhone (pas encore vérifié sur appareil). En Release, pas d'exception : l'API devra être servie en HTTPS.
 - **iPhone réel** : `NSLocalNetworkUsageDescription` (texte en français) est nécessaire pour accéder au réseau local.
 
 ## Architecture et choix d'implémentation

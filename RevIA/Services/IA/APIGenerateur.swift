@@ -63,6 +63,17 @@ nonisolated struct APIGenerateur: GenerateurQCM {
     }
 }
 
+extension APIGenerateur {
+    /// `GET /health`, sans jeton : vérifie seulement que le serveur répond. Le jeton est vérifié à la première génération.
+    static func verifierConnexion(a urlDeBase: URL, session: URLSession = .shared) async -> Bool {
+        let requete = URLRequest(url: urlDeBase.appending(path: "health"), timeoutInterval: 10)
+        guard let (donnees, reponse) = try? await session.data(for: requete),
+              (reponse as? HTTPURLResponse)?.statusCode == 200,
+              let sante = try? JSONDecoder().decode([String: String].self, from: donnees) else { return false }
+        return sante["status"] == "ok"
+    }
+}
+
 /// Corps `multipart/form-data`, que `URLSession` ne sait pas construire.
 nonisolated struct CorpsMultipart {
     let frontiere: String
