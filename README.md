@@ -76,7 +76,7 @@ L'app suit le modèle MVVM. Elle envoie le PDF à l'API, reçoit le QCM et l'enr
 
 ## Lancer le projet
 
-Prérequis : Xcode 15+, un iPhone ou simulateur sous iOS 17+, et une instance de [revia-api](https://github.com/pmassereyes/revia-api) lancée.
+Prérequis : Xcode 27+ (format de projet `project.xcproj`), un iPhone ou simulateur sous iOS 17+, et une instance de [revia-api](https://github.com/pmassereyes/revia-api) lancée.
 
 ```bash
 git clone https://github.com/pmassereyes/revia-app.git
