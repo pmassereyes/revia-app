@@ -160,6 +160,30 @@ struct APIGenerateurTests {
         #expect(URLProtocolSimule.requetesRecues.isEmpty)
     }
 
+    @Test func laConnexionEstTesteeSurHealthSansJeton() async throws {
+        URLProtocolSimule.repondre(statut: 200, corps: Data(#"{"status": "ok"}"#.utf8))
+
+        let joignable = await APIGenerateur.verifierConnexion(a: configuration.urlDeBase, session: URLProtocolSimule.session())
+
+        #expect(joignable)
+        let requete = try #require(URLProtocolSimule.requetesRecues.first)
+        #expect(requete.httpMethod == "GET")
+        #expect(requete.url?.absoluteString == "http://exemple.test:8000/health")
+        #expect(requete.value(forHTTPHeaderField: "X-API-Token") == nil)
+    }
+
+    @Test func unServeurEnErreurEstInjoignable() async {
+        URLProtocolSimule.repondre(statut: 500, corps: Data("erreur".utf8))
+
+        #expect(await !APIGenerateur.verifierConnexion(a: configuration.urlDeBase, session: URLProtocolSimule.session()))
+    }
+
+    @Test func uneCoupureReseauRendLeServeurInjoignable() async {
+        URLProtocolSimule.echouer(avec: URLError(.cannotConnectToHost))
+
+        #expect(await !APIGenerateur.verifierConnexion(a: configuration.urlDeBase, session: URLProtocolSimule.session()))
+    }
+
     @Test func unPDFDeExactement20MoEstEnvoye() async throws {
         URLProtocolSimule.repondre(statut: 200, corps: try fixture("reponse_exemple"))
         let limite = Data(count: 20 * 1024 * 1024)

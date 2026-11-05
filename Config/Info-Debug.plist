@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<!-- Debug seulement : fusionné avec l'Info.plist généré par Xcode. Rien de tout cela en Release. -->
+<dict>
+	<!-- Valeurs initiales de Réglages, issues de Secrets.xcconfig quand il est branché (vides sinon) -->
+	<key>API_BASE_URL</key>
+	<string>$(API_BASE_URL)</string>
+	<key>API_TOKEN</key>
+	<string>$(API_TOKEN)</string>
+	<!-- API locale en HTTP pendant le développement -->
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsLocalNetworking</key>
+		<true/>
+	</dict>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>RevIA se connecte à l'API de génération des QCM lancée sur votre Mac pendant le développement.</string>
+</dict>
+</plist>

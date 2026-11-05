@@ -43,7 +43,7 @@ L'app suit le modèle MVVM. Elle envoie le PDF à l'API, reçoit le QCM et l'enr
 - [ ] Génération depuis le détail d'un cours, mise en cache, jamais de régénération implicite
 - [ ] Quiz question par question, avec correction et explication immédiates
 - [ ] Écran de résultats : score et liste des erreurs
-- [ ] Réglages : URL de l'API et jeton stockés dans le Keychain
+- [x] Réglages : URL de l'API et jeton stockés dans le Keychain
 
 **Mémorisation (Phase 3)**
 - [ ] Système de Leitner à 5 boîtes
