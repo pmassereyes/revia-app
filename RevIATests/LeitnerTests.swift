@@ -84,11 +84,15 @@ struct ReponsesLeitnerTests {
         #expect(question.prochaineRevision == date(2026, 11, 6, 0, 0))
     }
 
-    @Test func uneNouvelleQuestionEstEnBoite1EtRevientLeLendemain() {
+    @Test func uneNouvelleQuestionEstEnBoite1EtRevientLeLendemain() throws {
+        // Le conteneur doit rester en vie tant que ses objets servent
+        let conteneur = try StockageDonnees.conteneur(enMemoire: true)
+        defer { withExtendedLifetime(conteneur) {} }
         let cours = Cours(titre: "C")
+        conteneur.mainContext.insert(cours)
         cours.remplacerQuestions(
             par: ReponseQCM(qcm: [qcm("Q")], avertissement: nil),
-            dans: try! StockageDonnees.conteneur(enMemoire: true).mainContext,
+            dans: conteneur.mainContext,
             maintenant: jour,
             calendrier: calendrierDeTest
         )

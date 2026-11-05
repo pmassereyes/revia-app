@@ -140,7 +140,7 @@ Un code inconnu se traite comme une erreur générique, avec le `message` reçu.
 - **« À revoir aujourd'hui »** : `FileDeRevision` filtre en mémoire les questions de `@Query` (les plus en retard d'abord). La date de référence (`aujourdHui`) est tenue par `RootView` et rafraîchie quand l'app revient au premier plan. Le quiz est **figé au lancement** (`fullScreenCover(item:)` avec un `QuizViewModel` créé au toucher) : répondre fait sortir les questions de la liste, et un quiz attaché à cette liste se fermerait avant les résultats.
 - **Quiz** : une seule réponse par question, corrigée tout de suite. Après la réponse, pas de `.disabled` sur les propositions, qui griserait la correction : on utilise `allowsHitTesting(false)`.
 - **`SessionRevision`** : date, périmètre (`cours` ou `aRevoir`), titre, score, et pour chaque réponse le thème, le nom de l'UE et le résultat (`ReponseSession`) : c'est la source des statistiques.
-- **Statistiques** par UE et par `theme`, avec Swift Charts. **Rappel quotidien** par notification locale (`UNUserNotificationCenter`).
+- **Statistiques** (`StatsViewModel`, calculs purs à partir des `SessionRevision` et des boîtes des questions) par UE et par `theme`, avec Swift Charts. Les thèmes sont triés du plus faible au plus fort. **Rappel quotidien** par notification locale (`UNUserNotificationCenter`).
 - **Vérification visuelle sans piloter l'interface** : dans un test temporaire, jamais versionné, rendre une vue avec `ImageRenderer` en PNG, puis la regarder. Cela marche pour les vues en `VStack` ; `List` et `ScrollView` se rendent mal.
 
 ## Tests
@@ -154,6 +154,7 @@ Un code inconnu se traite comme une erreur générique, avec le `message` reçu.
   - le retour en boîte 1 depuis n'importe quelle boîte (J+1) ;
   - une nouvelle question (boîte 1, J+1) ;
   - le calcul en jours calendaires : une réponse donnée à 23 h 59 et une donnée à 0 h 01 tombent bien sur des jours différents.
+- **Un `ModelContainer` de test doit rester en vie** tant que ses objets servent : le garder en propriété de la suite, ou en variable locale avec `defer { withExtendedLifetime(conteneur) {} }`. Écrire `try conteneur(...).mainContext` le libère aussitôt et fait planter le processus de test, ce qui fait échouer en cascade des tests sans rapport.
 - Simulation du réseau : `RevIATests/Outils/URLProtocolSimule.swift`. Son état est partagé : toute suite qui l'utilise est `@Suite(.serialized)`. Les fixtures se chargent avec `fixture("nom")` (`RevIATests/Outils/Fixtures.swift`).
 - Essai manuel de bout en bout : API lancée par `make dev` dans `../revia-api`, app sur le simulateur.
 - **Essai du client sans appeler l'IA** : lancer l'API sur un autre port avec un jeton jetable passé en variable d'environnement (`API_TOKEN=… .venv/bin/uvicorn app.main:app --port 8765`, sans lire le `.env`), puis envoyer un fichier qui ne commence pas par `%PDF-`. Réponses attendues : `invalid_token` avec un mauvais jeton, `invalid_request` avec `nb_questions` à 31, `invalid_pdf` sinon, ce qui prouve que le multipart est bien lu. Arrêter le serveur ensuite.

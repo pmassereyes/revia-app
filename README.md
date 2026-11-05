@@ -48,7 +48,7 @@ L'app suit le modèle MVVM. Elle envoie le PDF à l'API, reçoit le QCM et l'enr
 **Mémorisation (Phase 3)**
 - [x] Système de Leitner à 5 boîtes
 - [x] Mode « À revoir aujourd'hui », toutes UE confondues
-- [ ] Statistiques par UE et par thème (Swift Charts)
+- [x] Statistiques par UE et par thème (Swift Charts)
 - [ ] Rappel quotidien par notification locale
 
 **Plus tard** : scan de notes papier, Share Extension, mode examen chronométré, flashcards, export Anki, widget, synchronisation iCloud.
