@@ -3,6 +3,7 @@
 //  RevIA
 //
 
+import SwiftData
 import SwiftUI
 
 @main
@@ -11,5 +12,6 @@ struct RevIAApp: App {
         WindowGroup {
             RootView()
         }
+        .modelContainer(for: StockageDonnees.modeles)
     }
 }

@@ -3,6 +3,7 @@
 //  RevIA
 //
 
+import SwiftData
 import SwiftUI
 
 /// Vue racine : un onglet par grande fonction de l'app.
@@ -11,12 +12,8 @@ struct RootView: View {
 
     var body: some View {
         TabView {
-            ContentUnavailableView(
-                "Bibliothèque",
-                systemImage: "books.vertical",
-                description: Text("En construction")
-            )
-            .tabItem { Label("Bibliothèque", systemImage: "books.vertical") }
+            BibliothequeView()
+                .tabItem { Label("Bibliothèque", systemImage: "books.vertical") }
 
             ReglagesView(viewModel: reglages)
                 .tabItem { Label("Réglages", systemImage: "gearshape") }
@@ -26,4 +23,5 @@ struct RootView: View {
 
 #Preview {
     RootView()
+        .modelContainer(try! StockageDonnees.conteneur(enMemoire: true))
 }

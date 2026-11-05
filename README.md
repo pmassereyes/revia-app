@@ -38,7 +38,7 @@ L'app suit le modèle MVVM. Elle envoie le PDF à l'API, reçoit le QCM et l'enr
 - [x] Tests de décodage sur la réponse d'exemple partagée avec l'API
 
 **MVP (Phase 2)**
-- [ ] Bibliothèque des UE et de leurs cours
+- [x] Bibliothèque des UE et de leurs cours
 - [ ] Import d'un PDF, rattaché à une UE et une date
 - [ ] Génération depuis le détail d'un cours, mise en cache, jamais de régénération implicite
 - [ ] Quiz question par question, avec correction et explication immédiates
