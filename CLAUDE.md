@@ -38,6 +38,15 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **`Info.plist` de Debug** : `Config/Info-Debug.plist`, hors des dossiers synchronisés, branché par `"INFOPLIST_FILE[config=Debug]"` et fusionné par Xcode avec l'`Info.plist` généré (`GENERATE_INFOPLIST_FILE`). Rien en Release.
 - **Reste à brancher, par l'utilisateur dans Xcode (facultatif)** : `Config/Secrets.xcconfig` comme configuration de base (Projet → Info → Configurations). D'ici là, `$(API_BASE_URL)` et `$(API_TOKEN)` arrivent vides, et l'adresse et le jeton se saisissent dans Réglages.
 
+## Hébergement de l'API (Render)
+
+- **Render, offre gratuite** (choix de l'utilisateur, 2026-11-05). Le service web est de type Docker, construit par Render depuis le dépôt privé `revia-api` (branche `main`, région Francfort). Aucune modification de `revia-api` n'est nécessaire.
+- **Variables d'environnement, saisies par l'utilisateur dans Render**, jamais par Claude ni dans un dépôt : `API_TOKEN` (un jeton propre à la production, distinct de celui du développement), `GEMINI_API_KEY`, `PORT=8000` (le Dockerfile écoute sur 8000), et toute autre variable personnalisée dans son `.env`. Health check : `/health`.
+- **Veille** après 15 min sans requête, puis environ 1 min de réveil. L'app en tient compte : 75 s pour « Tester la connexion », 300 s pour une génération.
+- **Cache éphémère** : il est perdu à chaque mise en veille, redéploiement ou redémarrage. Relancer une génération coupée n'est donc gratuit que dans les 15 min, et « Régénérer » donne alors de nouvelles questions. Les données de l'app ne sont pas concernées : elles sont sur l'iPhone.
+- **L'adresse du service** (`https://<service>.onrender.com`) ne s'écrit jamais dans le dépôt : elle se saisit dans Réglages.
+- **Vérifier sans secret** : `curl https://<service>.onrender.com/health`, puis un `POST /v1/qcm` avec un faux jeton, qui doit répondre `401 invalid_token`. Avec le vrai jeton, c'est l'utilisateur qui teste, dans son propre terminal, en envoyant un fichier non PDF : réponse `400 invalid_pdf`, sans appel à Gemini.
+
 ## Installation sur un iPhone (Debug)
 
 - iPhone : activer le mode développeur (Réglages → Confidentialité et sécurité ; l'option apparaît après une première connexion à Xcode). Avec une équipe personnelle gratuite, faire confiance au développeur au premier lancement (Réglages → Général → VPN et gestion de l'appareil). L'app expire au bout de 7 jours : la relancer depuis Xcode.
