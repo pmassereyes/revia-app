@@ -62,8 +62,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Préparée le 2026-11-05 ; l'envoi se fait depuis le compte de l'utilisateur (Apple Developer Program, individuel).
 - **Déjà dans le projet** :
-  - icône provisoire (`AppIcon.png`, 1024 px, opaque) ; elle se redessine avec `Outils/dessiner-icone.swift` (Core Graphics, sans symbole SF, interdit dans une icône d'app) ;
-  - `RevIA/PrivacyInfo.xcprivacy` : pas de suivi ; contenu des PDF déclaré comme « autre contenu utilisateur », envoyé à l'API pour le fonctionnement de l'app et non lié à l'identité ; `UserDefaults` justifié par `CA92.1` ;
+  - icône choisie par l'utilisateur : son avatar stylisé, pensif, le regard levé vers une bulle qui contient les cartes de révision (`AppIcon.png`, 1024 px, opaque). Elle se redessine avec `Outils/dessiner-icone.swift` (Core Graphics, sans symbole SF, interdit dans une icône d'app) ;
+  - `RevIA/PrivacyInfo.xcprivacy`, **confirmé tel quel par l'utilisateur (2026-11-05)** : pas de suivi ; contenu des PDF déclaré comme « autre contenu utilisateur », envoyé à l'API pour le fonctionnement de l'app et non lié à l'identité ; `UserDefaults` justifié par `CA92.1` ;
   - `ITSAppUsesNonExemptEncryption = NO` (HTTPS standard seulement), qui répond à la question de conformité à l'export à chaque envoi ;
   - catégorie Éducation.
   La compilation Release pour iPhone ne contient aucune clé de Debug (ATS, réseau local, `API_*`).
@@ -72,7 +72,7 @@ Préparée le 2026-11-05 ; l'envoi se fait depuis le compte de l'utilisateur (Ap
   1. Incrémenter le numéro de build, `CURRENT_PROJECT_VERSION` (la version visible est `MARKETING_VERSION`). Deux envois ne peuvent pas avoir le même numéro.
   2. Dans Xcode, choisir la destination « Any iOS Device », puis Product → Archive, puis Organizer → Distribute App → TestFlight → Upload.
   3. Dans App Store Connect → TestFlight : attendre le traitement (10 à 30 min), ajouter les testeurs internes, puis installer depuis l'app TestFlight. Chaque version est valable 90 jours.
-- **À décider avant une publication sur l'App Store** : l'icône définitive, l'étiquette de confidentialité (reprendre le manifeste et mentionner l'IA tierce qui traite les PDF), et le maintien de l'iPad (`TARGETED_DEVICE_FAMILY = 1,2`, qui demande des captures iPad) ou un passage à l'iPhone seul.
+- **À décider avant une publication sur l'App Store** : l'étiquette de confidentialité (reprendre le manifeste et mentionner l'IA tierce qui traite les PDF), et le maintien de l'iPad (`TARGETED_DEVICE_FAMILY = 1,2`, qui demande des captures iPad) ou un passage à l'iPhone seul.
 
 ## Commandes
 
