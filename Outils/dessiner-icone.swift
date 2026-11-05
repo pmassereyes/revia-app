@@ -5,8 +5,8 @@
 //  Usage : swiftc -o /tmp/dessiner-icone Outils/dessiner-icone.swift && /tmp/dessiner-icone RevIA/Assets.xcassets/AppIcon.appiconset/AppIcon.png
 //
 
-// Icône de RevIA : avatar stylisé de l'auteur, pensif, le regard levé vers une bulle de pensée
-// qui contient les cartes de révision. Dessinée en Core Graphics, sans symbole SF (interdit dans une icône d'app).
+// Icône de RevIA : avatar stylisé de l'auteur, pensif, la main au menton et le regard levé vers une bulle
+// de pensée qui contient les cartes de révision. Dessinée en Core Graphics, sans symbole SF (interdit dans une icône d'app).
 // Image opaque de 1024 px, comme l'exige l'App Store.
 import CoreGraphics
 import Foundation
@@ -24,13 +24,14 @@ func couleur(_ hex: UInt32, _ alpha: CGFloat = 1) -> CGColor {
 }
 
 let bleu = couleur(0x2966FA), violet = couleur(0x7840F5)
-let peau = couleur(0xB07650), peauOmbre = couleur(0x8F5A3A)
+let fondClair = couleur(0xF4E8D6), fondFonce = couleur(0xE6D3B8), contourBulle = couleur(0xD8C2A2)
+let peau = couleur(0xCC976D), peauOmbre = couleur(0xA8724D)
 let cheveux = couleur(0x221A16), cheveuxReflet = couleur(0x3B2E27)
-let haut = couleur(0xFF8A5B), hautOmbre = couleur(0xE5704A)
+let haut = couleur(0x1C1C21), hautOmbre = couleur(0x2E2E35), manche = couleur(0x2A2A30)
 let blanc = couleur(0xFFFFFF), encre = couleur(0x1E1A2E)
 
-// Fond : dégradé bleu-violet, l'identité de l'app
-ctx.drawLinearGradient(CGGradient(colorsSpace: espace, colors: [bleu, violet] as CFArray, locations: [0, 1])!,
+// Fond : dégradé beige
+ctx.drawLinearGradient(CGGradient(colorsSpace: espace, colors: [fondClair, fondFonce] as CFArray, locations: [0, 1])!,
                        start: CGPoint(x: 0, y: 1024), end: CGPoint(x: 1024, y: 0), options: [])
 
 // Repère en haut à gauche, plus naturel pour dessiner un visage
@@ -69,13 +70,11 @@ func carte(_ cx: CGFloat, _ cy: CGFloat, _ l: CGFloat, _ h: CGFloat, _ angle: CG
 // Bulle de pensée, en haut à droite, avec les cartes de révision
 ctx.saveGState()
 ctx.setShadow(offset: CGSize(width: 0, height: 10), blur: 30, color: couleur(0x000000, 0.18))
+let cercles: [(CGFloat, CGFloat, CGFloat)] = [(705, 250, 90), (790, 195, 106), (868, 262, 86), (785, 305, 96), (705, 305, 68), (668, 418, 30), (632, 472, 17)]
 ctx.beginTransparencyLayer(auxiliaryInfo: nil)
-for (x, y, r) in [(705, 250, 90), (790, 195, 106), (868, 262, 86), (785, 305, 96), (705, 305, 68)] as [(CGFloat, CGFloat, CGFloat)] {
-    ellipse(x, y, r, r, blanc)
-}
+for (x, y, r) in cercles { ellipse(x, y, r + 5, r + 5, contourBulle) }
+for (x, y, r) in cercles { ellipse(x, y, r, r, blanc) }
 ctx.endTransparencyLayer()
-ellipse(668, 418, 30, 30, blanc)
-ellipse(632, 472, 17, 17, blanc)
 ctx.restoreGState()
 carte(808, 250, 112, 144, 0.22, couleur(0xB9C8FF))
 carte(778, 258, 112, 144, 0, bleu)
@@ -138,6 +137,35 @@ trait([CGPoint(x: 412, y: 702), CGPoint(x: 445, y: 708), CGPoint(x: 472, y: 694)
 // Joues
 ellipse(322, 645, 26, 16, couleur(0xE0705A, 0.28))
 ellipse(530, 645, 26, 16, couleur(0xE0705A, 0.28))
+
+// Main au menton : avant-bras dans sa manche, poing sous le menton
+func forme(_ cx: CGFloat, _ cy: CGFloat, _ l: CGFloat, _ h: CGFloat, _ rayon: CGFloat, _ angle: CGFloat, _ c: CGColor, contour: CGColor? = nil) {
+    ctx.saveGState()
+    ctx.translateBy(x: cx, y: cy)
+    ctx.rotate(by: angle)
+    let chemin = CGPath(roundedRect: CGRect(x: -l / 2, y: -h / 2, width: l, height: h), cornerWidth: rayon, cornerHeight: rayon, transform: nil)
+    if let contour {
+        ctx.setStrokeColor(contour)
+        ctx.setLineWidth(10)
+        ctx.addPath(chemin)
+        ctx.strokePath()
+    }
+    ctx.setFillColor(c)
+    ctx.addPath(chemin)
+    ctx.fillPath()
+    ctx.restoreGState()
+}
+// Pose du penseur : le menton repose sur le poing fermé, sans doigt tendu
+forme(548, 965, 124, 250, 56, -0.42, manche)
+forme(500, 872, 122, 40, 18, -0.42, hautOmbre)
+forme(462, 806, 136, 104, 46, -0.08, peau, contour: peauOmbre)
+// Doigts repliés : plis horizontaux sur la face du poing
+for y in [790, 818, 845] as [CGFloat] {
+    trait([CGPoint(x: 452, y: y), CGPoint(x: 486, y: y - 3), CGPoint(x: 516, y: y - 1)], peauOmbre, 6)
+}
+// Pouce, replié le long du bord gauche du poing
+forme(414, 800, 36, 78, 18, 0.12, peau, contour: peauOmbre)
+forme(414, 800, 36, 78, 18, 0.12, peau)
 
 let destination = CGImageDestinationCreateWithURL(URL(fileURLWithPath: CommandLine.arguments[1]) as CFURL, UTType.png.identifier as CFString, 1, nil)!
 CGImageDestinationAddImage(destination, ctx.makeImage()!, nil)

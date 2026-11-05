@@ -62,7 +62,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Préparée le 2026-11-05 ; l'envoi se fait depuis le compte de l'utilisateur (Apple Developer Program, individuel).
 - **Déjà dans le projet** :
-  - icône choisie par l'utilisateur : son avatar stylisé, pensif, le regard levé vers une bulle qui contient les cartes de révision (`AppIcon.png`, 1024 px, opaque). Elle se redessine avec `Outils/dessiner-icone.swift` (Core Graphics, sans symbole SF, interdit dans une icône d'app) ;
+  - icône choisie par l'utilisateur : son avatar stylisé, pensif, le menton sur le poing et le regard levé vers une bulle qui contient les cartes de révision, sur fond beige (`AppIcon.png`, 1024 px, opaque). Elle se redessine avec `Outils/dessiner-icone.swift` (Core Graphics, sans symbole SF, interdit dans une icône d'app) ;
   - `RevIA/PrivacyInfo.xcprivacy`, **confirmé tel quel par l'utilisateur (2026-11-05)** : pas de suivi ; contenu des PDF déclaré comme « autre contenu utilisateur », envoyé à l'API pour le fonctionnement de l'app et non lié à l'identité ; `UserDefaults` justifié par `CA92.1` ;
   - `ITSAppUsesNonExemptEncryption = NO` (HTTPS standard seulement), qui répond à la question de conformité à l'export à chaque envoi ;
   - catégorie Éducation.
