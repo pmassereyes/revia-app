@@ -37,4 +37,14 @@ final class QuestionQCM {
     var bonneReponse: String {
         propositions.indices.contains(indexBonneReponse) ? propositions[indexBonneReponse] : ""
     }
+
+    /// Applique la règle de Leitner après une réponse donnée le `date`.
+    func enregistrerReponse(correcte: Bool, le date: Date = .now, calendrier: Calendar = .current) {
+        boite = Leitner.boiteApres(reponseCorrecte: correcte, depuis: boite)
+        prochaineRevision = Leitner.prochaineRevision(boite: boite, depuis: date, calendrier: calendrier)
+    }
+
+    func estARevoir(le date: Date = .now, calendrier: Calendar = .current) -> Bool {
+        Leitner.estARevoir(prochaineRevision: prochaineRevision, le: date, calendrier: calendrier)
+    }
 }
