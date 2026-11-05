@@ -15,4 +15,22 @@ enum StockageDonnees {
         let configuration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: enMemoire)
         return try ModelContainer(for: schema, configurations: configuration)
     }
+
+    static let messageGenerationInterrompue =
+        "La génération a été interrompue. Relancez-la : si le serveur avait terminé, le résultat arrivera tout de suite."
+
+    /// Au lancement, aucune génération ne peut être en cours : celles qui l'étaient ont été coupées
+    /// par la fermeture de l'app. Elles passent en échec, pour pouvoir être relancées.
+    static func reprendreGenerationsInterrompues(dans contexte: ModelContext) {
+        let enCours = StatutGeneration.enCours.rawValue
+        let interrompus = (try? contexte.fetch(FetchDescriptor<Cours>(predicate: #Predicate { $0.statutBrut == enCours }))) ?? []
+        for cours in interrompus {
+            cours.statut = .echec
+            cours.codeErreur = "interrompue"
+            cours.messageErreur = messageGenerationInterrompue
+        }
+        if !interrompus.isEmpty {
+            try? contexte.save()
+        }
+    }
 }

@@ -47,3 +47,39 @@ nonisolated enum GenerationError: Error, Equatable, Sendable {
         self = .api(CodeErreurAPI(code: erreur.code), message: erreur.message)
     }
 }
+
+nonisolated extension GenerationError {
+    /// Valeur enregistrée dans `Cours.codeErreur`.
+    var code: String {
+        switch self {
+        case .api(let code, _): code.rawValue
+        case .reseau: "reseau"
+        case .pdfTropVolumineux: "pdf_trop_volumineux"
+        }
+    }
+
+    /// Message affiché : celui de l'API, suivi de la conduite à tenir.
+    var messagePourUtilisateur: String {
+        switch self {
+        case .reseau:
+            "Impossible de joindre l'API. Vérifiez qu'elle est lancée, et son adresse dans Réglages."
+        case .pdfTropVolumineux:
+            "Ce PDF dépasse 20 Mo, la taille maximale acceptée par l'API."
+        case .api(let code, let message):
+            [message, code.conseil].compactMap(\.self).joined(separator: " ")
+        }
+    }
+}
+
+nonisolated extension CodeErreurAPI {
+    /// Conduite à tenir, quand l'utilisateur peut faire quelque chose.
+    var conseil: String? {
+        switch self {
+        case .jetonInvalide: "Vérifiez le jeton dans Réglages."
+        case .tropDeRequetes: "Patientez une minute avant de réessayer."
+        case .quotaEpuise, .iaSurchargee: "Réessayez dans quelques minutes."
+        case .delaiDepasse, .echecGeneration, .erreurInterne, .inconnu: "Vous pouvez réessayer."
+        case .pdfInvalide, .pdfTropVolumineux, .requeteInvalide, .iaIndisponible: nil
+        }
+    }
+}
