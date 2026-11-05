@@ -58,6 +58,22 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - Xcode : ajouter son Apple ID (Réglages → Comptes), choisir l'équipe dans Signing & Capabilities, puis choisir l'iPhone comme destination. Si l'identifiant de bundle est refusé, l'utilisateur en choisit un autre, unique.
 - API : le Mac et l'iPhone sur le même Wi-Fi (un réseau d'entreprise peut isoler les appareils), `make dev` lancé et le pare-feu de macOS qui autorise les connexions entrantes. Dans RevIA → Réglages : `http://<nom-du-mac>.local:8000` (nom affiché dans Réglages Système → Général → Partage → Nom d'hôte local), puis accepter l'accès au réseau local.
 
+## Distribution par TestFlight
+
+Préparée le 2026-11-05 ; l'envoi se fait depuis le compte de l'utilisateur (Apple Developer Program, individuel).
+- **Déjà dans le projet** :
+  - icône provisoire (`AppIcon.png`, 1024 px, opaque) ; elle se redessine avec `Outils/dessiner-icone.swift` (Core Graphics, sans symbole SF, interdit dans une icône d'app) ;
+  - `RevIA/PrivacyInfo.xcprivacy` : pas de suivi ; contenu des PDF déclaré comme « autre contenu utilisateur », envoyé à l'API pour le fonctionnement de l'app et non lié à l'identité ; `UserDefaults` justifié par `CA92.1` ;
+  - `ITSAppUsesNonExemptEncryption = NO` (HTTPS standard seulement), qui répond à la question de conformité à l'export à chaque envoi ;
+  - catégorie Éducation.
+  La compilation Release pour iPhone ne contient aucune clé de Debug (ATS, réseau local, `API_*`).
+- **Une fois, dans App Store Connect** : Apps → + → Nouvelle app, plateforme iOS, identifiant de bundle `io.github.pmassereyes.revia` (proposé une fois enregistré par Xcode avec l'équipe payante), SKU libre. Le nom doit être unique sur l'App Store : « RevIA » peut être déjà pris.
+- **À chaque envoi** :
+  1. Incrémenter le numéro de build, `CURRENT_PROJECT_VERSION` (la version visible est `MARKETING_VERSION`). Deux envois ne peuvent pas avoir le même numéro.
+  2. Dans Xcode, choisir la destination « Any iOS Device », puis Product → Archive, puis Organizer → Distribute App → TestFlight → Upload.
+  3. Dans App Store Connect → TestFlight : attendre le traitement (10 à 30 min), ajouter les testeurs internes, puis installer depuis l'app TestFlight. Chaque version est valable 90 jours.
+- **À décider avant une publication sur l'App Store** : l'icône définitive, l'étiquette de confidentialité (reprendre le manifeste et mentionner l'IA tierce qui traite les PDF), et le maintien de l'iPad (`TARGETED_DEVICE_FAMILY = 1,2`, qui demande des captures iPad) ou un passage à l'iPhone seul.
+
 ## Commandes
 
 ```bash
