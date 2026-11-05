@@ -28,12 +28,17 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Format Xcode 27** : `RevIA.xcodeproj/project.xcproj` est un fichier texte (JSON avec virgules finales), et non plus un `.pbxproj`. Claude peut y modifier les réglages et les cibles, puis **vérifie toujours avec `xcodebuild build` et `xcodebuild test`**. Ce format ne s'ouvre pas dans un Xcode antérieur à la version 27.
 - **Dossiers synchronisés** (`"kind": "folder"`) : tout fichier créé sur disque dans `RevIA/` ou `RevIATests/` rejoint automatiquement sa cible, sans toucher au projet.
 - **Pas de schéma partagé** : Xcode et `xcodebuild` créent automatiquement le schéma `RevIA`. Le partager (`xcshareddata/xcschemes`) le jour où une CI en aura besoin.
-- **Identifiant d'équipe (`DEVELOPMENT_TEAM`) jamais versionné**, puisque le dépôt est public. On le choisit dans Xcode (Signing & Capabilities), qui l'écrit dans `project.xcproj`. Le filtre Git `sans-equipe` (`.gitattributes`) retire ces lignes à chaque commit, et la copie de travail les garde. **Sur un nouveau clone, activer le filtre une fois** :
+- **Identifiant d'équipe (`DEVELOPMENT_TEAM`) jamais versionné**, puisque le dépôt est public. On le choisit dans Xcode (Signing & Capabilities), qui l'écrit dans `project.xcproj`. Le filtre Git `sans-equipe` (`.gitattributes`) fait deux choses :
+  - à chaque commit, il retire les lignes d'équipe (`clean`) ;
+  - à chaque réécriture du fichier par Git (changement de branche, `pull`), il remet l'équipe mémorisée dans la configuration Git locale (`smudge`, clé `revia.equipe`). Sans lui, Xcode perdrait l'équipe à chaque changement de branche.
+
+  **Sur un nouveau clone, activer le filtre une fois**, puis mémoriser l'équipe après l'avoir choisie dans Xcode :
   ```bash
   git config filter.sans-equipe.clean "sed -E '/\"DEVELOPMENT_TEAM(\\[[^]]*\\])?\":/d'"
-  git config filter.sans-equipe.smudge cat
+  git config filter.sans-equipe.smudge "perl -pe 'BEGIN { \$e = qx(git config --get revia.equipe); chomp \$e } s/^(\\s*)\"CODE_SIGN_STYLE\": \"Automatic\",\\n/\$&\$1\"DEVELOPMENT_TEAM\": \"\$e\",\\n/ if \$e ne q()'"
+  git config revia.equipe "$(grep -m1 -oE '"DEVELOPMENT_TEAM": "[A-Z0-9]+"' RevIA.xcodeproj/project.xcproj | cut -d'"' -f4)"
   ```
-  Avec l'équipe présente localement, `git status` peut afficher `project.xcproj` comme modifié alors que `git diff` est vide : un `git add` le fait disparaître sans rien changer au dépôt. Avant chaque commit qui touche le projet, vérifier quand même avec `git show :RevIA.xcodeproj/project.xcproj | grep DEVELOPMENT_TEAM`, qui ne doit rien afficher.
+  Pour changer d'équipe : la choisir dans Xcode, puis relancer la dernière commande. Avec l'équipe présente localement, `git status` peut afficher `project.xcproj` comme modifié alors que `git diff` est vide : un `git add` le fait disparaître sans rien changer au dépôt. Avant chaque commit qui touche le projet, vérifier quand même avec `git show :RevIA.xcodeproj/project.xcproj | grep DEVELOPMENT_TEAM`, qui ne doit rien afficher.
 - Identifiant de bundle : choisi par l'utilisateur, jamais écrit ici.
 - **`Info.plist` de Debug** : `Config/Info-Debug.plist`, hors des dossiers synchronisés, branché par `"INFOPLIST_FILE[config=Debug]"` et fusionné par Xcode avec l'`Info.plist` généré (`GENERATE_INFOPLIST_FILE`). Rien en Release.
 - **Reste à brancher, par l'utilisateur dans Xcode (facultatif)** : `Config/Secrets.xcconfig` comme configuration de base (Projet → Info → Configurations). D'ici là, `$(API_BASE_URL)` et `$(API_TOKEN)` arrivent vides, et l'adresse et le jeton se saisissent dans Réglages.
