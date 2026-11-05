@@ -9,10 +9,18 @@ import SwiftUI
 /// Vue racine : un onglet par grande fonction de l'app.
 struct RootView: View {
     @Environment(\.modelContext) private var contexte
+    @Environment(\.scenePhase) private var phase
+    @Query private var questions: [QuestionQCM]
     @State private var reglages = ReglagesViewModel(reglages: .standard)
+    /// Rafraîchie au retour au premier plan, pour suivre le changement de jour.
+    @State private var aujourdHui = Date.now
 
     var body: some View {
         TabView {
+            ARevoirView(aujourdHui: aujourdHui)
+                .tabItem { Label("À revoir", systemImage: "rectangle.stack") }
+                .badge(FileDeRevision.nombreARevoir(parmi: questions, le: aujourdHui))
+
             BibliothequeView()
                 .tabItem { Label("Bibliothèque", systemImage: "books.vertical") }
 
@@ -20,6 +28,9 @@ struct RootView: View {
                 .tabItem { Label("Réglages", systemImage: "gearshape") }
         }
         .task { StockageDonnees.reprendreGenerationsInterrompues(dans: contexte) }
+        .onChange(of: phase) { _, nouvelle in
+            if nouvelle == .active { aujourdHui = .now }
+        }
     }
 }
 
