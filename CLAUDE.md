@@ -149,5 +149,5 @@ Un code inconnu se traite comme une erreur générique, avec le `message` reçu.
 - **En-tête Xcode** en tête de chaque fichier Swift (`//  Fichier.swift`, `//  RevIA`), comme les fichiers existants.
 - **Plan d'abord** : avant chaque chantier, présenter un plan et attendre la validation de l'utilisateur.
 - **Réponses** en français, terminées par une section « En résumé » de 3 à 5 puces.
-- **Circuit Git** : même circuit que `revia-api`. Une issue, une branche `<n°>-<slug>` depuis `dev`, une PR vers `dev` (« Refs #n »), puis une PR `dev` → `main` (« Livraison de dev sur main : … », « Closes #n »), avec des merge commits. **L'utilisateur merge toutes les PR.**
+- **Circuit Git** : même circuit que `revia-api`. Une issue, une branche `<n°>-<slug>` depuis `dev`, une PR vers `dev` (« Refs #n »), puis une PR `dev` → `main` (« Livraison de dev sur main : … », « Closes #n »), avec des merge commits. **Claude merge les PR** (à la demande de l'utilisateur), une fois la compilation et les tests au vert.
 - **Pas de CI pour l'instant** : à rediscuter une fois le client de l'API et ses tests en place.
