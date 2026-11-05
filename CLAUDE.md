@@ -121,7 +121,12 @@ Un code inconnu se traite comme une erreur générique, avec le `message` reçu.
 ## Architecture et choix d'implémentation
 
 - **Génération derrière un protocole** (`GenerateurQCM`), implémenté par `APIGenerateur`. Les ViewModels ne dépendent que du protocole, ce qui permet de les tester avec un faux générateur.
-- **SwiftData** : `UE` 1-n `Cours` 1-n `QuestionQCM`, plus `SessionRevision` (voir le tableau du README). Les suppressions se font en cascade de l'UE vers ses cours et leurs questions. `StatutGeneration` (enum stockée sur `Cours`) : jamais générée, en cours, terminée, ou échec avec son `code` d'erreur.
+- **SwiftData** : `UE` 1-n `Cours` 1-n `QuestionQCM`, plus `SessionRevision` (voir le tableau du README). Les suppressions se font en cascade de l'UE vers ses cours et leurs questions.
+  - Schéma unique dans `StockageDonnees`, utilisé par l'app et par les tests (`conteneur(enMemoire: true)`). Un changement de schéma pendant le développement peut demander de réinstaller l'app sur le simulateur.
+  - **SwiftData ne garde pas l'ordre d'une relation** : chaque `QuestionQCM` porte son `ordre`, et on lit `cours.questionsOrdonnees`.
+  - `StatutGeneration` (jamais générée, en cours, terminée, échec) est stocké en valeur brute (`statutBrut`), avec `codeErreur` et `messageErreur` à part. Même principe pour la couleur d'une UE (`CouleurUE`, palette fixe).
+  - `Cours.remplacerQuestions(par:dans:)` convertit une `ReponseQCM` : questions en boîte 1, à revoir le lendemain, avertissement conservé, erreur précédente effacée.
+  - Les classes `@Model` ne sont pas isolées sur `MainActor` : ce qu'elles appellent (`Leitner`, par exemple) doit être `nonisolated`.
 - **Pas de régénération implicite** (README) : la génération ne part que d'une action explicite. Les questions sont enregistrées en SwiftData. Régénérer remplace les questions du cours, après confirmation.
 - **Import** : `.fileImporter` pour les PDF (URL à accès sécurisé, puis copie dans le conteneur de l'app). Le scan passe par VisionKit, qui produit des images : **les assembler en PDF (PDFKit) avant l'envoi**, car l'API n'accepte que du PDF.
 - **Leitner** : règles décidées par l'utilisateur.
