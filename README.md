@@ -34,7 +34,7 @@ L'app suit le modèle MVVM. Elle envoie le PDF à l'API, reçoit le QCM et l'enr
 
 **Génération (Phase 1)**
 - [x] Décodage des QCM (`struct QCM: Codable`) et erreurs typées `GenerationError`
-- [ ] Client `APIGenerateur` : envoi multipart, mapping des erreurs HTTP
+- [x] Client `APIGenerateur` : envoi multipart, mapping des erreurs HTTP
 - [x] Tests de décodage sur la réponse d'exemple partagée avec l'API
 
 **MVP (Phase 2)**

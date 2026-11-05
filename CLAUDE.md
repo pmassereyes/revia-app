@@ -19,7 +19,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
   - le code de l'app est `@MainActor` sans annotation, ViewModels `@Observable` compris ;
   - ce qui doit être `Sendable` ou tourner hors du thread principal (types d'échange avec l'API, client réseau si besoin) se déclare `nonisolated` ;
   - la cible `RevIATests` n'a pas ce réglage : un test qui manipule des types de l'app est `@MainActor` ;
-  - `URLSession` en `async`/`await`.
+  - `URLSession` en `async`/`await` ;
+  - avec `SWIFT_APPROACHABLE_CONCURRENCY`, une fonction `async` `nonisolated` s'exécute sur l'acteur de l'appelant : il faut `@concurrent` pour la sortir du thread principal. Inutile pour le client de l'API, qui attend le réseau sans bloquer.
 - `ExtractionTexte.swift` n'est pas nécessaire à la génération, puisque l'API envoie le PDF brut à l'IA, qui lit aussi les pages scannées. Ne l'implémenter que pour un besoin d'affichage ou de recherche.
 
 ## Projet Xcode
@@ -141,13 +142,15 @@ Un code inconnu se traite comme une erreur générique, avec le `message` reçu.
   - le retour en boîte 1 depuis n'importe quelle boîte (J+1) ;
   - une nouvelle question (boîte 1, J+1) ;
   - le calcul en jours calendaires : une réponse donnée à 23 h 59 et une donnée à 0 h 01 tombent bien sur des jours différents.
+- Simulation du réseau : `RevIATests/Outils/URLProtocolSimule.swift`. Son état est partagé : toute suite qui l'utilise est `@Suite(.serialized)`. Les fixtures se chargent avec `fixture("nom")` (`RevIATests/Outils/Fixtures.swift`).
 - Essai manuel de bout en bout : API lancée par `make dev` dans `../revia-api`, app sur le simulateur.
+- **Essai du client sans appeler l'IA** : lancer l'API sur un autre port avec un jeton jetable passé en variable d'environnement (`API_TOKEN=… .venv/bin/uvicorn app.main:app --port 8765`, sans lire le `.env`), puis envoyer un fichier qui ne commence pas par `%PDF-`. Réponses attendues : `invalid_token` avec un mauvais jeton, `invalid_request` avec `nb_questions` à 31, `invalid_pdf` sinon, ce qui prouve que le multipart est bien lu. Arrêter le serveur ensuite.
 
 ## Conventions et façon de travailler
 
 - **Langue** : français pour les identifiants métier, les commentaires, les textes d'interface et les messages de commit. Commits sous la forme « Ajout de … (#n) », **sans trailer `Co-Authored-By`**.
 - **En-tête Xcode** en tête de chaque fichier Swift (`//  Fichier.swift`, `//  RevIA`), comme les fichiers existants.
-- **Plan d'abord** : avant chaque chantier, présenter un plan et attendre la validation de l'utilisateur.
+- **Enchaînement des lots, sans attendre de validation** (demande de l'utilisateur) : annoncer le plan au début du lot, puis aller jusqu'à la livraison sur `main`. Une décision de produit prise par défaut est signalée dans la PR et dans le compte rendu à l'utilisateur.
 - **Réponses** en français, terminées par une section « En résumé » de 3 à 5 puces.
 - **Circuit Git** : même circuit que `revia-api`. Une issue, une branche `<n°>-<slug>` depuis `dev`, une PR vers `dev` (« Refs #n »), puis une PR `dev` → `main` (« Livraison de dev sur main : … », « Closes #n »), avec des merge commits. **Claude merge les PR** (à la demande de l'utilisateur), une fois la compilation et les tests au vert.
 - **Pas de CI pour l'instant** : à rediscuter une fois le client de l'API et ses tests en place.
