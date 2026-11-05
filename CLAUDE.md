@@ -152,6 +152,8 @@ Un code inconnu se traite comme une erreur générique, avec le `message` reçu.
 - Simulation du réseau : `RevIATests/Outils/URLProtocolSimule.swift`. Son état est partagé : toute suite qui l'utilise est `@Suite(.serialized)`. Les fixtures se chargent avec `fixture("nom")` (`RevIATests/Outils/Fixtures.swift`).
 - Essai manuel de bout en bout : API lancée par `make dev` dans `../revia-api`, app sur le simulateur.
 - **Essai du client sans appeler l'IA** : lancer l'API sur un autre port avec un jeton jetable passé en variable d'environnement (`API_TOKEN=… .venv/bin/uvicorn app.main:app --port 8765`, sans lire le `.env`), puis envoyer un fichier qui ne commence pas par `%PDF-`. Réponses attendues : `invalid_token` avec un mauvais jeton, `invalid_request` avec `nb_questions` à 31, `invalid_pdf` sinon, ce qui prouve que le multipart est bien lu. Arrêter le serveur ensuite.
+- **Essai de bout en bout sans coût** : le PDF d'une phrase de `make essai-pauvre` (`scripts.essai.pdf_minimal(PHRASE_PAUVRE)`, toujours le même) est dans le cache de l'API pour 10 questions. Le recréer avec le Python de l'API, puis le faire passer par `DetailCoursViewModel` dans un test temporaire, jamais versionné. On obtient une question et un avertissement, et le journal du serveur doit indiquer `cache=hit`. Tout autre PDF appelle réellement Gemini.
+- Outils de test : `FauxGenerateur`, `stockageTemporaire()`, `fichierSource(_:)` (`RevIATests/Outils/`).
 
 ## Conventions et façon de travailler
 
