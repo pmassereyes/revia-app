@@ -24,6 +24,9 @@ struct RootView: View {
             BibliothequeView()
                 .tabItem { Label("Bibliothèque", systemImage: "books.vertical") }
 
+            StatsView()
+                .tabItem { Label("Statistiques", systemImage: "chart.bar") }
+
             ReglagesView(viewModel: reglages)
                 .tabItem { Label("Réglages", systemImage: "gearshape") }
         }
