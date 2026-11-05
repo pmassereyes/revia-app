@@ -136,7 +136,11 @@ Un code inconnu se traite comme une erreur générique, avec le `message` reçu.
   - **Bonne réponse en boîte 5 : la question reste en boîte 5 et revient 16 jours plus tard.** Elle ne sort jamais de la révision.
   - Erreur, quelle que soit la boîte : retour en boîte 1, révision le lendemain.
   - Les dates se comptent en **jours calendaires** (`Calendar`, fuseau local, début de journée), pas en heures : une question est « à revoir » si le jour de sa prochaine révision est aujourd'hui ou passé. `FileDeRevision` alimente « À revoir aujourd'hui », toutes UE confondues.
+  - **Toute réponse compte**, y compris dans le quiz d'un cours, et pas seulement dans « À revoir aujourd'hui » (décision par défaut du 2026-11-05, à confirmer par l'utilisateur). `QuizViewModel` applique la règle dès la réponse (`QuestionQCM.enregistrerReponse`) : quitter le quiz garde le suivi. La `SessionRevision` n'est enregistrée qu'à la fin.
+- **Quiz** : une seule réponse par question, corrigée tout de suite. Après la réponse, pas de `.disabled` sur les propositions, qui griserait la correction : on utilise `allowsHitTesting(false)`.
+- **`SessionRevision`** : date, périmètre (`cours` ou `aRevoir`), titre, score, et pour chaque réponse le thème, le nom de l'UE et le résultat (`ReponseSession`) : c'est la source des statistiques.
 - **Statistiques** par UE et par `theme`, avec Swift Charts. **Rappel quotidien** par notification locale (`UNUserNotificationCenter`).
+- **Vérification visuelle sans piloter l'interface** : dans un test temporaire, jamais versionné, rendre une vue avec `ImageRenderer` en PNG, puis la regarder. Cela marche pour les vues en `VStack` ; `List` et `ScrollView` se rendent mal.
 
 ## Tests
 

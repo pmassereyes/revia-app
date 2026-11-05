@@ -18,4 +18,14 @@ nonisolated enum Leitner {
         let debutDuJour = calendrier.startOfDay(for: date)
         return calendrier.date(byAdding: .day, value: intervalles[boite - 1], to: debutDuJour) ?? debutDuJour
     }
+
+    /// Bonne réponse : boîte suivante, sauf en boîte 5 où la question reste. Erreur : retour en boîte 1.
+    static func boiteApres(reponseCorrecte: Bool, depuis boite: Int) -> Int {
+        reponseCorrecte ? min(boite + 1, derniereBoite) : premiereBoite
+    }
+
+    /// Une question est à revoir si le jour de sa prochaine révision est aujourd'hui ou passé.
+    static func estARevoir(prochaineRevision: Date, le date: Date, calendrier: Calendar = .current) -> Bool {
+        calendrier.startOfDay(for: prochaineRevision) <= calendrier.startOfDay(for: date)
+    }
 }

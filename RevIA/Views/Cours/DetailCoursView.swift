@@ -13,6 +13,7 @@ struct DetailCoursView: View {
     @State private var viewModel: DetailCoursViewModel
     @State private var regenerationAConfirmer = false
     @State private var pdfAffiche: URL?
+    @State private var quizAffiche = false
 
     init(cours: Cours) {
         _viewModel = State(initialValue: DetailCoursViewModel(cours: cours))
@@ -36,6 +37,10 @@ struct DetailCoursView: View {
 
             Section("QCM") {
                 etat
+                if !cours.questions.isEmpty && !viewModel.generationEnCours {
+                    Button("Commencer le quiz", systemImage: "play.fill") { quizAffiche = true }
+                        .font(.headline)
+                }
                 if viewModel.peutGenerer {
                     Stepper(
                         "\(viewModel.nbQuestions) questions",
@@ -63,6 +68,9 @@ struct DetailCoursView: View {
         .navigationTitle(cours.titre)
         .navigationBarTitleDisplayMode(.inline)
         .quickLookPreview($pdfAffiche)
+        .fullScreenCover(isPresented: $quizAffiche) {
+            QuizView(viewModel: QuizViewModel(questions: cours.questionsOrdonnees, perimetre: .cours, titre: cours.titre))
+        }
         .confirmationDialog(
             "Régénérer le QCM ?",
             isPresented: $regenerationAConfirmer,
