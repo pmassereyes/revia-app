@@ -80,7 +80,7 @@ struct UEDetailView: View {
             Button("Supprimer", role: .destructive) { viewModel.supprimer(cours, contexte: contexte) }
             Button("Annuler", role: .cancel) {}
         } message: { cours in
-            Text("« \(cours.titre) », son PDF et ses \(cours.questions.count) questions seront supprimés.")
+            Text("« \(cours.titre) » sera supprimé, avec son PDF et \(libelleQuestions(cours.questions.count)).")
         }
     }
 }
@@ -117,7 +117,7 @@ struct LigneCours: View {
         case .enCours:
             Text("Génération en cours…")
         case .terminee:
-            Text("\(cours.questions.count) questions")
+            Text(libelleQuestions(cours.questions.count))
         case .echec:
             Text("Échec de la génération")
                 .foregroundStyle(.red)

@@ -3,6 +3,7 @@
 //  RevIA
 //
 
+import SwiftData
 import SwiftUI
 
 struct ReglagesView: View {
@@ -45,6 +46,8 @@ struct ReglagesView: View {
                     .disabled(viewModel.etatConnexion == .enCours)
                 }
 
+                SectionRappel()
+
                 if let message = viewModel.messageErreur {
                     Section {
                         Label(message, systemImage: "exclamationmark.triangle")
@@ -75,4 +78,57 @@ struct ReglagesView: View {
 
 #Preview {
     ReglagesView(viewModel: ReglagesViewModel(reglages: .standard))
+}
+
+/// Activation et heure du rappel quotidien.
+private struct SectionRappel: View {
+    @AppStorage(CleRappel.actif) private var actif = false
+    @AppStorage(CleRappel.minutes) private var minutes = Notifications.heureParDefaut
+    @Query private var questions: [QuestionQCM]
+    @State private var refuse = false
+
+    var body: some View {
+        Section {
+            Toggle("Rappel quotidien", isOn: Binding(get: { actif }, set: { nouveau in Task { await activer(nouveau) } }))
+            if actif {
+                DatePicker("Heure", selection: heure, displayedComponents: .hourAndMinute)
+            }
+        } header: {
+            Text("Rappel")
+        } footer: {
+            Text(refuse
+                ? "Les notifications de RevIA sont refusées : autorisez-les dans l'app Réglages de l'iPhone."
+                : "Une notification, seulement les jours où des questions sont à revoir.")
+        }
+        .onChange(of: minutes) { Task { await replanifier() } }
+    }
+
+    private var heure: Binding<Date> {
+        Binding(
+            get: { Calendar.current.date(byAdding: .minute, value: minutes, to: Calendar.current.startOfDay(for: .now)) ?? .now },
+            set: { date in
+                let composantes = Calendar.current.dateComponents([.hour, .minute], from: date)
+                minutes = (composantes.hour ?? 0) * 60 + (composantes.minute ?? 0)
+            }
+        )
+    }
+
+    private func activer(_ nouveau: Bool) async {
+        if nouveau {
+            let autorise = await Notifications.demanderAutorisation()
+            refuse = !autorise
+            actif = autorise
+        } else {
+            actif = false
+        }
+        await replanifier()
+    }
+
+    private func replanifier() async {
+        await Notifications.replanifier(
+            revisions: questions.filter { $0.cours != nil }.map(\.prochaineRevision),
+            actif: actif,
+            minutes: minutes
+        )
+    }
 }

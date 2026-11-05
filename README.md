@@ -7,7 +7,7 @@
 ![SwiftUI](https://img.shields.io/badge/SwiftUI-0D96F6?logo=swift&logoColor=white)
 ![SwiftData](https://img.shields.io/badge/SwiftData-1C6EF2?logo=apple&logoColor=white)
 
-> 🚧 **En développement** — Phase 1 : moteur IA
+> 🚧 **En développement** — phases 1 à 3 terminées (génération, MVP, mémorisation) ; à venir : scan de notes papier et la suite de la liste « Plus tard »
 
 <!-- Captures à ajouter dès que les écrans existent :
 <p align="center">
@@ -49,7 +49,7 @@ L'app suit le modèle MVVM. Elle envoie le PDF à l'API, reçoit le QCM et l'enr
 - [x] Système de Leitner à 5 boîtes
 - [x] Mode « À revoir aujourd'hui », toutes UE confondues
 - [x] Statistiques par UE et par thème (Swift Charts)
-- [ ] Rappel quotidien par notification locale
+- [x] Rappel quotidien par notification locale
 
 **Plus tard** : scan de notes papier, Share Extension, mode examen chronométré, flashcards, export Anki, widget, synchronisation iCloud.
 
