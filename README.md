@@ -28,7 +28,7 @@ flowchart LR
     A <--> E[("SwiftData")]
 ```
 
-L'app suit le modèle MVVM. Elle envoie le PDF à l'API, reçoit le QCM et l'enregistre localement avec SwiftData.
+L'app suit le modèle MVVM. Elle envoie le PDF à l'API, reçoit le QCM et l'enregistre localement avec SwiftData. L'API est hébergée sur Render, en HTTPS ; en développement, elle tourne en local.
 
 ## Fonctionnalités
 
