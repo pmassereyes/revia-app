@@ -1,4 +1,0 @@
-//
-//  PromptQCM.swift
-//  RevIA
-//
