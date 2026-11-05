@@ -28,10 +28,21 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **Format Xcode 27** : `RevIA.xcodeproj/project.xcproj` est un fichier texte (JSON avec virgules finales), et non plus un `.pbxproj`. Claude peut y modifier les réglages et les cibles, puis **vérifie toujours avec `xcodebuild build` et `xcodebuild test`**. Ce format ne s'ouvre pas dans un Xcode antérieur à la version 27.
 - **Dossiers synchronisés** (`"kind": "folder"`) : tout fichier créé sur disque dans `RevIA/` ou `RevIATests/` rejoint automatiquement sa cible, sans toucher au projet.
 - **Pas de schéma partagé** : Xcode et `xcodebuild` créent automatiquement le schéma `RevIA`. Le partager (`xcshareddata/xcschemes`) le jour où une CI en aura besoin.
-- **Identifiant d'équipe (`DEVELOPMENT_TEAM`) jamais versionné**, puisque le dépôt est public. Le simulateur n'en a pas besoin. Pour un iPhone réel, il passera par `Secrets.xcconfig` ; d'ici là, le choisir dans Xcode sans commiter la modification du projet.
+- **Identifiant d'équipe (`DEVELOPMENT_TEAM`) jamais versionné**, puisque le dépôt est public. On le choisit dans Xcode (Signing & Capabilities), qui l'écrit dans `project.xcproj`. Le filtre Git `sans-equipe` (`.gitattributes`) retire ces lignes à chaque commit, et la copie de travail les garde. **Sur un nouveau clone, activer le filtre une fois** :
+  ```bash
+  git config filter.sans-equipe.clean "sed -E '/\"DEVELOPMENT_TEAM(\\[[^]]*\\])?\":/d'"
+  git config filter.sans-equipe.smudge cat
+  ```
+  Avec l'équipe présente localement, `git status` peut afficher `project.xcproj` comme modifié alors que `git diff` est vide : un `git add` le fait disparaître sans rien changer au dépôt. Avant chaque commit qui touche le projet, vérifier quand même avec `git show :RevIA.xcodeproj/project.xcproj | grep DEVELOPMENT_TEAM`, qui ne doit rien afficher.
 - Identifiant de bundle : choisi par l'utilisateur, jamais écrit ici.
 - **`Info.plist` de Debug** : `Config/Info-Debug.plist`, hors des dossiers synchronisés, branché par `"INFOPLIST_FILE[config=Debug]"` et fusionné par Xcode avec l'`Info.plist` généré (`GENERATE_INFOPLIST_FILE`). Rien en Release.
 - **Reste à brancher, par l'utilisateur dans Xcode (facultatif)** : `Config/Secrets.xcconfig` comme configuration de base (Projet → Info → Configurations). D'ici là, `$(API_BASE_URL)` et `$(API_TOKEN)` arrivent vides, et l'adresse et le jeton se saisissent dans Réglages.
+
+## Installation sur un iPhone (Debug)
+
+- iPhone : activer le mode développeur (Réglages → Confidentialité et sécurité ; l'option apparaît après une première connexion à Xcode). Avec une équipe personnelle gratuite, faire confiance au développeur au premier lancement (Réglages → Général → VPN et gestion de l'appareil). L'app expire au bout de 7 jours : la relancer depuis Xcode.
+- Xcode : ajouter son Apple ID (Réglages → Comptes), choisir l'équipe dans Signing & Capabilities, puis choisir l'iPhone comme destination. Si l'identifiant de bundle est refusé, l'utilisateur en choisit un autre, unique.
+- API : le Mac et l'iPhone sur le même Wi-Fi (un réseau d'entreprise peut isoler les appareils), `make dev` lancé et le pare-feu de macOS qui autorise les connexions entrantes. Dans RevIA → Réglages : `http://<nom-du-mac>.local:8000` (nom affiché dans Réglages Système → Général → Partage → Nom d'hôte local), puis accepter l'accès au réseau local.
 
 ## Commandes
 
