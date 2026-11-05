@@ -8,6 +8,7 @@ import SwiftUI
 
 /// Vue racine : un onglet par grande fonction de l'app.
 struct RootView: View {
+    @Environment(\.modelContext) private var contexte
     @State private var reglages = ReglagesViewModel(reglages: .standard)
 
     var body: some View {
@@ -18,6 +19,7 @@ struct RootView: View {
             ReglagesView(viewModel: reglages)
                 .tabItem { Label("Réglages", systemImage: "gearshape") }
         }
+        .task { StockageDonnees.reprendreGenerationsInterrompues(dans: contexte) }
     }
 }
 
